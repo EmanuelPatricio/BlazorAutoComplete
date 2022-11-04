@@ -1,0 +1,47 @@
+﻿@page "/search"
+@using Blazored.Typeahead
+@using BlazorAutoComplete.Data
+@using BlazorAutoComplete.Services
+
+<h3>AutoComplete</h3>
+
+<br />
+<br />
+<br />
+
+<BlazoredTypeahead SearchMethod="SearchingAccountAsync" MinimumLength=2 @bind-Value="selectedAccount">
+  <SelectedTemplate>@context.IdWithAlias</SelectedTemplate>
+  <ResultTemplate>@context.IdWithAlias</ResultTemplate>
+</BlazoredTypeahead>
+
+@if (selectedAccount != null)
+{
+  <p>Selected Account: @selectedAccount.IdWithAlias</p>
+}
+
+<br />
+<br />
+<br />
+
+<ul>
+  @foreach (var item in accounts)
+  {
+    <li>@item.IdWithAlias</li>
+  }
+</ul>
+
+@code {
+  private List<Account> accounts;
+  private Account selectedAccount;
+
+  protected override void OnInitialized()
+  {
+    AccountService accountService = new AccountService();
+    accounts = accountService.GetAccounts();
+  }
+
+  private async Task<IEnumerable<Account>> SearchingAccountAsync(string searchText)
+  {
+    return await Task.FromResult(accounts.Where(x => x.IdWithAlias.Contains(searchText)).ToList());
+  }
+}
